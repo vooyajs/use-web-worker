@@ -74,7 +74,7 @@ interface UseWebWorkerFnOptions {
 
 #### Returns
 
-- `workerFn: (...args: Parameters<T>) => Promise<ReturnType<T>>` - execute the worker function.
+- `workerFn: (...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>>` - execute the worker function.
 - `workerStatus: WebWorkerStatus` - current status enum value.
 - `workerTerminate: (status?: WebWorkerStatus) => void` - terminate the active worker and set a status.
 
@@ -104,6 +104,14 @@ function App() {
   workerFn(21);
 }
 ```
+
+### Task lifecycle
+
+Only one task can run per hook instance. Overlapping calls reject without interrupting the active task. Async worker functions resolve to their awaited result.
+
+`workerTerminate()` and component unmount reject an active task with an error named `AbortError`. Handle the returned Promise, including cancellation. Timeout, worker startup, message serialization, and worker execution failures reject the task and invoke `onError`. A settled task releases its worker, timer, and Blob URL; later calls can start a new task.
+
+The function and local helpers are serialized into a separate worker scope. They cannot capture component variables, module imports, or the DOM. Pass data as arguments. `dependencies` loads classic scripts with `importScripts()`; it does not provide an ESM/WASM module loader. A restrictive Content Security Policy may disallow Blob workers.
 
 ### useWebWorker
 

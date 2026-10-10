@@ -74,7 +74,7 @@ interface UseWebWorkerFnOptions {
 
 #### 返回值
 
-- `workerFn: (...args: Parameters<T>) => Promise<ReturnType<T>>` - 执行 worker 函数。
+- `workerFn: (...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>>` - 执行 worker 函数。
 - `workerStatus: WebWorkerStatus` - 当前状态枚举值。
 - `workerTerminate: (status?: WebWorkerStatus) => void` - 终止当前 worker 并设置状态。
 
@@ -104,6 +104,14 @@ function App() {
   workerFn(21);
 }
 ```
+
+### 任务生命周期
+
+每个 hook 实例同一时间只运行一个任务。重叠调用会返回 rejected Promise，不会打断正在运行的任务。异步函数的返回值会自动等待后再交给调用者。
+
+`workerTerminate()` 和组件卸载会使进行中的任务以名称为 `AbortError` 的错误结束。请处理返回的 Promise，包括取消情况。超时、Worker 启动、消息序列化和任务执行失败都会 reject，并调用 `onError`。任务结束后释放 Worker、定时器及 Blob URL；后续调用可以启动新任务。
+
+函数和本地辅助函数会被序列化到独立的 Worker 作用域，不能捕获组件变量、模块导入或 DOM，请通过参数传递数据。`dependencies` 使用 `importScripts()` 加载传统脚本，不是 ESM/WASM 模块加载器。严格的 Content Security Policy 可能禁止 Blob Worker。
 
 ### useWebWorker
 

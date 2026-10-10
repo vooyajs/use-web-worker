@@ -13,22 +13,14 @@ export type WebWorkerStatus =
   | WorkerStatusType.TIMEOUT
   | WorkerStatusType.RUNNING;
 
-// Worker cache to avoid creating duplicate blobs
-const workerCache = new Map<string, string>();
-
 function createWorkerBlobUrl(
   fn: (...args: any[]) => any,
   dependencies: string[] = [],
   localDependencies: ((...args: any[]) => any)[] = []
 ) {
-  const cacheKey = `${fn.toString()}_${JSON.stringify(dependencies)}_${localDependencies.length}`;
-
-  if (workerCache.has(cacheKey)) {
-    return workerCache.get(cacheKey)!;
-  }
-
+  // Each task owns its URL; the hook revokes it when that task settles.
   const blobCode = `
-${dependencies.map(d => `importScripts("${d}");`).join('\n')}
+${dependencies.map(d => `importScripts(${JSON.stringify(d)});`).join('\n')}
 ${localDependencies.map(f => `${f.toString()}`).join('\n')}
 const fnString = ${fn.toString()};
 self.onmessage = async function(e) {
@@ -37,16 +29,12 @@ self.onmessage = async function(e) {
     const result = await fnString.apply(null, [...args, self]);
     self.postMessage([${WorkerStatusType.SUCCESS}, result]);
   } catch (error) {
-    self.postMessage([${WorkerStatusType.ERROR}, error.message]);
+    self.postMessage([${WorkerStatusType.ERROR}, error instanceof Error ? error.message : String(error)]);
   }
 }`;
 
   const blob = new Blob([blobCode], { type: 'text/javascript' });
-  const url = URL.createObjectURL(blob);
-
-  workerCache.set(cacheKey, url);
-
-  return url;
+  return URL.createObjectURL(blob);
 }
 
 export default createWorkerBlobUrl;
