@@ -1,8 +1,8 @@
-import Image from 'next/image';
 import benchmark from '../data/benchmark-results.json';
 import { CodeBlock } from './CodeBlock';
 import { CopyButton } from './CopyButton';
 import { InteractiveBenchmark } from './InteractiveBenchmark';
+import { WasmLab } from './WasmLab';
 
 const installCommand = 'pnpm add @atom-universe/use-web-worker';
 
@@ -33,6 +33,7 @@ const progressExample = `export function computeMandelbrot(
 
 const sections = [
   { href: '#install', label: 'Install' },
+  { href: '#lab', label: 'Compute lab' },
   { href: '#benchmark', label: 'Benchmark' },
   { href: '#api', label: 'API' },
   { href: '#examples', label: 'Examples' },
@@ -54,7 +55,9 @@ export function Hero() {
     <main className="page-shell">
       <header className="topbar">
         <a className="brand" href="#top" aria-label="useWebWorker home">
-          <Image src="/uww-icon.svg" alt="" width={28} height={28} />
+          <span className="brand-mark" aria-hidden="true">
+            w<span>↗</span>
+          </span>
           <span>useWebWorker</span>
         </a>
         <nav aria-label="Page sections">
@@ -73,76 +76,91 @@ export function Hero() {
         <div className="hero-copy">
           <p className="eyebrow">React hooks for Web Workers</p>
           <h1>
-            Heavy work.
+            Give your UI
             <br />
-            <span>Light interactions.</span>
+            <span>room to breathe.</span>
           </h1>
           <p className="lead">
-            Give expensive computations their own thread. Keep your React app ready for the next
-            click—with a typed function call, progress updates, and lifecycle cleanup.
+            Move the heavy work off the main thread.
+            <br className="desktop-break" /> Keep every click, scroll, and interaction feeling
+            light.
           </p>
           <div className="hero-links">
             <a className="primary-link" href="#install">
               Get started <span aria-hidden="true">↗</span>
             </a>
-            <a href="#benchmark">
-              Try the live demo <span aria-hidden="true">↓</span>
+            <a href="#lab">
+              Explore the lab <span aria-hidden="true">↓</span>
             </a>
           </div>
           <div className="hero-actions" id="install">
             <code>{installCommand}</code>
             <CopyButton text={installCommand} />
           </div>
-          <div className="metric-row" aria-label="Package highlights">
-            <div>
-              <strong>Async</strong>
-              <span>function-style API</span>
-            </div>
-            <div>
-              <strong>0 deps</strong>
-              <span>React peer only</span>
-            </div>
-            <div>
-              <strong>TS first</strong>
-              <span>typed hook return</span>
-            </div>
-          </div>
+          <p className="hero-meta">
+            TYPED CALLS <span>/</span> ZERO RUNTIME DEPS <span>/</span> REACT HOOKS
+          </p>
         </div>
+        <WasmLab />
+      </section>
 
-        <div className="hero-visual">
-          <div className="visual-label">
-            <span className="status-dot" /> A LITTLE SPACE FOR YOUR UI
-          </div>
-          <CodeBlock code={quickStart} title="quick-start.tsx" />
-          <div className="thread-map" aria-label="Execution model">
-            <div>
-              <span className="thread-label">MAIN THREAD</span>
-              <strong>Click. Scroll. Respond.</strong>
-              <div className="thread-ticks" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
-              </div>
-            </div>
-            <div>
-              <span className="thread-label">WORKER THREAD</span>
-              <strong>Compute in the background.</strong>
-              <div className="work-bar" aria-hidden="true" />
-            </div>
-          </div>
+      <div className="runtime-strip">
+        <span>BUILT FOR THE BROWSER</span>
+        <p>
+          JavaScript convenience. <strong>Room for Rust.</strong>
+        </p>
+        <a href="#wasm-lifecycle">How the lab works ↓</a>
+      </div>
+      <section id="wasm-lifecycle" className="section-band lifecycle-section">
+        <div className="section-heading">
+          <p className="eyebrow">01 / LOAD WHEN IT MATTERS</p>
+          <h2>
+            Fast first paint.
+            <br />
+            Compute when you need it.
+          </h2>
+          <p>
+            This experiment uses Vooya’s Rust provider to build a pure-compute Store. A dedicated
+            Worker loads its WASM only on demand.
+          </p>
         </div>
+        <div className="lifecycle-notes">
+          <article>
+            <span>BUILD TIME</span>
+            <h3>Rust → WebAssembly</h3>
+            <p>Compile Rust ahead of deployment. Visitors need a browser, not a Rust toolchain.</p>
+          </article>
+          <article>
+            <span>FIRST INTERACTION</span>
+            <h3>Fetch. Compile. Initialize.</h3>
+            <p>
+              Choose “Prepare WASM” to pay startup cost before running, or let the first run do it.
+              The lab measures these phases separately.
+            </p>
+          </article>
+          <article>
+            <span>NEXT INTERACTION</span>
+            <h3>Reuse the ready module.</h3>
+            <p>
+              Subsequent runs reuse the same Worker and WASM instance. Reset starts a new session;
+              the browser’s HTTP and compiler caches may still apply.
+            </p>
+          </article>
+        </div>
+        <p className="note lifecycle-caveat">
+          Lab timings are local measurements, not a JS-versus-Rust speed claim. Compute includes the
+          Store action, snapshot conversion, and pixel-buffer creation. Initialization includes the
+          JS binding import. This bridge is specific to this demo; it is not a useWebWorkerFn WASM
+          API. Streaming compilation can overlap fetch and compile in production.
+        </p>
       </section>
 
       <section className="section-band">
         <div className="section-heading">
-          <p className="eyebrow">Why workers</p>
-          <h2>Keep the interface in the conversation.</h2>
+          <p className="eyebrow">02 / THE EVERYDAY API</p>
+          <h2>A function call. Another thread.</h2>
         </div>
+        <CodeBlock code={quickStart} title="quick-start.tsx" />
         <div className="feature-grid">
           <article>
             <h3>Function-like calls</h3>

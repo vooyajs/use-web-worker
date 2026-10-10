@@ -295,7 +295,7 @@ function FractalPanel({ canvasRef, description, mode, onRun, state, title }: Fra
           <strong>{result ? `${result.maxTimerGapMs} ms` : '--'}</strong>
         </div>
         <div>
-          <span>Missed frames</span>
+          <span>Est. missed frames</span>
           <strong>{result ? result.missedFramesAt60hz : '--'}</strong>
         </div>
       </div>
