@@ -4,14 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/verify-wasm.mjs && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint src",
-    "vercel-build": "pnpm build",
-    "vercel-dev": "next dev",
-    "build:wasm": "node scripts/build-wasm.mjs",
-    "verify:wasm": "node scripts/verify-wasm.mjs",
-    "test:wasm": "node scripts/test-wasm.mjs"
+    "vercel-build": "next build",
+    "vercel-dev": "next dev"
   },
   "dependencies": {
     "@atom-universe/use-web-worker": "^2.1.1",
@@ -37,7 +34,6 @@
     "@types/react-dom": "^19",
     "@typescript-eslint/eslint-plugin": "^8.71.1",
     "@typescript-eslint/parser": "^8.71.1",
-    "@vooya/provider-rust": "0.2.0-alpha.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.18",
     "tailwindcss": "^4",

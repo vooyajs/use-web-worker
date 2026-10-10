@@ -24,6 +24,3 @@ coverage/
 
 tips.md
 packages/vite-plugin/*
-
-# Vooya Rust build workspace
-.vooya/

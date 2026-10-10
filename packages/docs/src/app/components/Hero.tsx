@@ -1,8 +1,9 @@
+import Image from 'next/image';
 import benchmark from '../data/benchmark-results.json';
 import { CodeBlock } from './CodeBlock';
 import { CopyButton } from './CopyButton';
+import { HeroCanvas } from './HeroCanvas';
 import { InteractiveBenchmark } from './InteractiveBenchmark';
-import { WasmLab } from './WasmLab';
 
 const installCommand = 'pnpm add @atom-universe/use-web-worker';
 
@@ -33,11 +34,9 @@ const progressExample = `export function computeMandelbrot(
 
 const sections = [
   { href: '#install', label: 'Install' },
-  { href: '#lab', label: 'Compute lab' },
   { href: '#benchmark', label: 'Benchmark' },
   { href: '#api', label: 'API' },
   { href: '#examples', label: 'Examples' },
-  { href: '#updates', label: 'Updates' },
 ];
 
 const statusRows = [
@@ -55,9 +54,7 @@ export function Hero() {
     <main className="page-shell">
       <header className="topbar">
         <a className="brand" href="#top" aria-label="useWebWorker home">
-          <span className="brand-mark" aria-hidden="true">
-            w<span>↗</span>
-          </span>
+          <Image src="/uww-icon.svg" alt="" width={28} height={28} />
           <span>useWebWorker</span>
         </a>
         <nav aria-label="Page sections">
@@ -75,92 +72,43 @@ export function Hero() {
       <section id="top" className="hero-section">
         <div className="hero-copy">
           <p className="eyebrow">React hooks for Web Workers</p>
-          <h1>
-            Give your UI
-            <br />
-            <span>room to breathe.</span>
-          </h1>
+          <h1>Move CPU-heavy work out of React’s render lane.</h1>
           <p className="lead">
-            Move the heavy work off the main thread.
-            <br className="desktop-break" /> Keep every click, scroll, and interaction feeling
-            light.
+            useWebWorker gives React apps a small function-style API for running expensive work in a
+            Web Worker, with TypeScript inference, status tracking, timeout handling, and automatic
+            cleanup.
           </p>
-          <div className="hero-links">
-            <a className="primary-link" href="#install">
-              Get started <span aria-hidden="true">↗</span>
-            </a>
-            <a href="#lab">
-              Explore the lab <span aria-hidden="true">↓</span>
-            </a>
-          </div>
           <div className="hero-actions" id="install">
             <code>{installCommand}</code>
             <CopyButton text={installCommand} />
           </div>
-          <p className="hero-meta">
-            TYPED CALLS <span>/</span> ZERO RUNTIME DEPS <span>/</span> REACT HOOKS
-          </p>
+          <div className="metric-row" aria-label="Package highlights">
+            <div>
+              <strong>1.86 KB</strong>
+              <span>minified bundle</span>
+            </div>
+            <div>
+              <strong>0 deps</strong>
+              <span>React peer only</span>
+            </div>
+            <div>
+              <strong>TS first</strong>
+              <span>typed hook return</span>
+            </div>
+          </div>
         </div>
-        <WasmLab />
-      </section>
 
-      <div className="runtime-strip">
-        <span>BUILT FOR THE BROWSER</span>
-        <p>
-          JavaScript convenience. <strong>Room for Rust.</strong>
-        </p>
-        <a href="#wasm-lifecycle">How the lab works ↓</a>
-      </div>
-      <section id="wasm-lifecycle" className="section-band lifecycle-section">
-        <div className="section-heading">
-          <p className="eyebrow">01 / LOAD WHEN IT MATTERS</p>
-          <h2>
-            Fast first paint.
-            <br />
-            Compute when you need it.
-          </h2>
-          <p>
-            This experiment uses Vooya’s Rust provider to build a pure-compute Store. A dedicated
-            Worker loads its WASM only on demand.
-          </p>
+        <div className="hero-visual">
+          <HeroCanvas />
+          <CodeBlock code={quickStart} title="quick-start.tsx" />
         </div>
-        <div className="lifecycle-notes">
-          <article>
-            <span>BUILD TIME</span>
-            <h3>Rust → WebAssembly</h3>
-            <p>Compile Rust ahead of deployment. Visitors need a browser, not a Rust toolchain.</p>
-          </article>
-          <article>
-            <span>FIRST INTERACTION</span>
-            <h3>Fetch. Compile. Initialize.</h3>
-            <p>
-              Choose “Prepare WASM” to pay startup cost before running, or let the first run do it.
-              The lab measures these phases separately.
-            </p>
-          </article>
-          <article>
-            <span>NEXT INTERACTION</span>
-            <h3>Reuse the ready module.</h3>
-            <p>
-              Subsequent runs reuse the same Worker and WASM instance. Reset starts a new session;
-              the browser’s HTTP and compiler caches may still apply.
-            </p>
-          </article>
-        </div>
-        <p className="note lifecycle-caveat">
-          Lab timings are local measurements, not a JS-versus-Rust speed claim. Compute includes the
-          Store action, snapshot conversion, and pixel-buffer creation. Initialization includes the
-          JS binding import. This bridge is specific to this demo; it is not a useWebWorkerFn WASM
-          API. Streaming compilation can overlap fetch and compile in production.
-        </p>
       </section>
 
       <section className="section-band">
         <div className="section-heading">
-          <p className="eyebrow">02 / THE EVERYDAY API</p>
-          <h2>A function call. Another thread.</h2>
+          <p className="eyebrow">Why workers</p>
+          <h2>Workers are not about making math faster. They keep the UI responsive.</h2>
         </div>
-        <CodeBlock code={quickStart} title="quick-start.tsx" />
         <div className="feature-grid">
           <article>
             <h3>Function-like calls</h3>
@@ -182,7 +130,7 @@ export function Hero() {
       <section id="benchmark" className="section-band">
         <div className="section-heading">
           <p className="eyebrow">Benchmark</p>
-          <h2>Feel the difference. Then measure it.</h2>
+          <h2>Measured responsiveness, not just total runtime.</h2>
           <p>
             The reproducible script runs a Mandelbrot-style workload on the main thread and in a
             worker thread. Total runtime can be similar, but the worker path keeps frame scheduling
@@ -208,12 +156,12 @@ export function Hero() {
           <div className="benchmark-card">
             <span>Main thread gap</span>
             <strong>{summary.mainThreadMaxTimerGapMs} ms</strong>
-            <p>{summary.mainThreadMissedFramesAt60hz} estimated missed 60Hz frame opportunities.</p>
+            <p>{summary.mainThreadMissedFramesAt60hz} missed 60Hz frames in the benchmark run.</p>
           </div>
           <div className="benchmark-card">
             <span>Worker path gap</span>
             <strong>{summary.workerMaxTimerGapMs} ms</strong>
-            <p>{summary.workerMissedFramesAt60hz} estimated missed 60Hz frame opportunities.</p>
+            <p>{summary.workerMissedFramesAt60hz} missed 60Hz frames in the benchmark run.</p>
           </div>
         </div>
 
@@ -222,7 +170,7 @@ export function Hero() {
             <span>Scenario</span>
             <span>Total time</span>
             <span>Max timer gap</span>
-            <span>Estimated missed frames</span>
+            <span>Missed frames</span>
           </div>
           <div>
             <span>Main thread</span>
@@ -240,16 +188,14 @@ export function Hero() {
 
         <p className="note">
           Generated by <code>pnpm benchmark</code> on {benchmark.environment.runtime}. Checksum
-          matched: {summary.checksumMatched ? 'yes' : 'no'}. This saved Node.js run measures timer
-          gaps, not browser paint frames or hook overhead. Results vary by device; try the browser
-          comparison above.
+          matched: {summary.checksumMatched ? 'yes' : 'no'}.
         </p>
       </section>
 
       <section id="api" className="section-band">
         <div className="section-heading">
           <p className="eyebrow">API quick reference</p>
-          <h2>One hook. A familiar workflow.</h2>
+          <h2>The current API surface is intentionally small.</h2>
         </div>
         <div className="api-grid">
           <article>
@@ -292,36 +238,17 @@ export function Hero() {
         <CodeBlock code={progressExample} title="progress-worker.ts" className="full-width" />
       </section>
 
-      <section id="updates" className="section-band release-band">
+      <section className="section-band todo-band">
         <div>
-          <p className="eyebrow">Maintenance update · unreleased</p>
-          <h2>A more dependable lifecycle.</h2>
-          <p>
-            The next patch, 2.2.2, focuses on task settlement and cleanup. The published package is
-            still 2.2.1.
-          </p>
+          <p className="eyebrow">Pending maintenance patch · 2.2.2</p>
+          <h2>More dependable task cleanup.</h2>
         </div>
-        <div className="release-detail">
-          <span className="release-badge">2.2.2 · pending</span>
-          <ul>
-            <li>Overlapping calls leave the active task intact.</li>
-            <li>
-              Cancellation settles with an <code>AbortError</code>.
-            </li>
-            <li>Workers, timers, and Blob URLs are released when a task ends.</li>
-          </ul>
-          <a href="https://github.com/vooyajs/use-web-worker/pull/1">
-            Read the patch notes <span aria-hidden="true">↗</span>
-          </a>
-        </div>
+        <p>
+          The pending patch rejects cancellation with AbortError, preserves active tasks when calls
+          overlap, and releases workers and Blob URLs on completion or failure. The published
+          package is still 2.2.1.
+        </p>
       </section>
-      <footer className="site-footer">
-        <a className="brand" href="#top">
-          useWebWorker
-        </a>
-        <span>A small part of the Vooya ecosystem.</span>
-        <a href="https://github.com/vooyajs/use-web-worker">Source on GitHub ↗</a>
-      </footer>
     </main>
   );
 }
