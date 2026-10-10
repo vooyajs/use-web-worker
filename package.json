@@ -13,7 +13,11 @@
     "sync:scripts": "node scripts/sync-scripts.js",
     "prepare": "husky install",
     "lint": "pnpm -r run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "changeset": "changeset",
+    "changeset:status": "changeset status",
+    "version:packages": "changeset version",
+    "release:publish": "pnpm --filter @atom-universe/use-web-worker exec release-it --config .release-it.changesets.json --no-increment"
   },
   "keywords": [
     "react",
@@ -24,6 +28,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@changesets/cli": "^3.0.3",
     "@commitlint/cli": "^18.0.0",
     "@commitlint/config-conventional": "^18.0.0",
     "@release-it/conventional-changelog": "^10.0.0",
@@ -47,5 +52,11 @@
     "*.{json,md}": [
       "prettier --write"
     ]
+  },
+  "pnpm": {
+    "overrides": {
+      "eslint-config-next>@typescript-eslint/eslint-plugin": "^8.0.0",
+      "eslint-config-next>@typescript-eslint/parser": "^8.0.0"
+    }
   }
 }

@@ -1,23 +1,13 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-jetbrains-mono',
-});
 
 export const metadata: Metadata = {
   title: 'useWebWorker - React Hook for Web Workers',
   description:
     'A powerful React hook for easy Web Worker integration with TypeScript support, automatic cleanup, and comprehensive error handling.',
   keywords: ['React', 'Web Workers', 'TypeScript', 'Performance', 'Hook'],
-  authors: [{ name: 'Atom Universe' }],
+  authors: [{ name: 'Vooya' }],
+  alternates: { canonical: 'https://use-web-worker-docs.vercel.app/' },
   openGraph: {
     title: 'useWebWorker - React Hook for Web Workers',
     description: 'A powerful React hook for easy Web Worker integration with TypeScript support.',
@@ -60,13 +50,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en">
       <head>
         <link rel="icon" href="/uww-icon.svg" type="image/svg+xml" />
         <link rel="icon" href="/uww-icon.svg" type="image/svg+xml" sizes="any" />
       </head>
       <body className="grid-bg antialiased">{children}</body>
-      <link rel="canonical" href="https://usewebworker.dev" />
     </html>
   );
 }

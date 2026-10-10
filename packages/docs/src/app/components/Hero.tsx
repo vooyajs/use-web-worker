@@ -1,7 +1,7 @@
+import Image from 'next/image';
 import benchmark from '../data/benchmark-results.json';
 import { CodeBlock } from './CodeBlock';
 import { CopyButton } from './CopyButton';
-import { HeroCanvas } from './HeroCanvas';
 import { InteractiveBenchmark } from './InteractiveBenchmark';
 
 const installCommand = 'pnpm add @atom-universe/use-web-worker';
@@ -36,6 +36,7 @@ const sections = [
   { href: '#benchmark', label: 'Benchmark' },
   { href: '#api', label: 'API' },
   { href: '#examples', label: 'Examples' },
+  { href: '#updates', label: 'Updates' },
 ];
 
 const statusRows = [
@@ -53,7 +54,7 @@ export function Hero() {
     <main className="page-shell">
       <header className="topbar">
         <a className="brand" href="#top" aria-label="useWebWorker home">
-          <img src="/uww-icon.svg" alt="" />
+          <Image src="/uww-icon.svg" alt="" width={28} height={28} />
           <span>useWebWorker</span>
         </a>
         <nav aria-label="Page sections">
@@ -63,7 +64,7 @@ export function Hero() {
             </a>
           ))}
         </nav>
-        <a className="github-link" href="https://github.com/atom-universe/useWebWorker">
+        <a className="github-link" href="https://github.com/vooyajs/use-web-worker">
           GitHub
         </a>
       </header>
@@ -71,20 +72,31 @@ export function Hero() {
       <section id="top" className="hero-section">
         <div className="hero-copy">
           <p className="eyebrow">React hooks for Web Workers</p>
-          <h1>Move CPU-heavy work out of React's render lane.</h1>
+          <h1>
+            Heavy work.
+            <br />
+            <span>Light interactions.</span>
+          </h1>
           <p className="lead">
-            useWebWorker gives React apps a small function-style API for running expensive work in a
-            Web Worker, with TypeScript inference, status tracking, timeout handling, and automatic
-            cleanup.
+            Give expensive computations their own thread. Keep your React app ready for the next
+            click—with a typed function call, progress updates, and lifecycle cleanup.
           </p>
+          <div className="hero-links">
+            <a className="primary-link" href="#install">
+              Get started <span aria-hidden="true">↗</span>
+            </a>
+            <a href="#benchmark">
+              Try the live demo <span aria-hidden="true">↓</span>
+            </a>
+          </div>
           <div className="hero-actions" id="install">
             <code>{installCommand}</code>
             <CopyButton text={installCommand} />
           </div>
           <div className="metric-row" aria-label="Package highlights">
             <div>
-              <strong>1.86 KB</strong>
-              <span>minified bundle</span>
+              <strong>Async</strong>
+              <span>function-style API</span>
             </div>
             <div>
               <strong>0 deps</strong>
@@ -98,15 +110,38 @@ export function Hero() {
         </div>
 
         <div className="hero-visual">
-          <HeroCanvas />
+          <div className="visual-label">
+            <span className="status-dot" /> A LITTLE SPACE FOR YOUR UI
+          </div>
           <CodeBlock code={quickStart} title="quick-start.tsx" />
+          <div className="thread-map" aria-label="Execution model">
+            <div>
+              <span className="thread-label">MAIN THREAD</span>
+              <strong>Click. Scroll. Respond.</strong>
+              <div className="thread-ticks" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
+            </div>
+            <div>
+              <span className="thread-label">WORKER THREAD</span>
+              <strong>Compute in the background.</strong>
+              <div className="work-bar" aria-hidden="true" />
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="section-band">
         <div className="section-heading">
           <p className="eyebrow">Why workers</p>
-          <h2>Workers are not about making math faster. They keep the UI responsive.</h2>
+          <h2>Keep the interface in the conversation.</h2>
         </div>
         <div className="feature-grid">
           <article>
@@ -129,7 +164,7 @@ export function Hero() {
       <section id="benchmark" className="section-band">
         <div className="section-heading">
           <p className="eyebrow">Benchmark</p>
-          <h2>Measured responsiveness, not just total runtime.</h2>
+          <h2>Feel the difference. Then measure it.</h2>
           <p>
             The reproducible script runs a Mandelbrot-style workload on the main thread and in a
             worker thread. Total runtime can be similar, but the worker path keeps frame scheduling
@@ -155,12 +190,12 @@ export function Hero() {
           <div className="benchmark-card">
             <span>Main thread gap</span>
             <strong>{summary.mainThreadMaxTimerGapMs} ms</strong>
-            <p>{summary.mainThreadMissedFramesAt60hz} missed 60Hz frames in the benchmark run.</p>
+            <p>{summary.mainThreadMissedFramesAt60hz} estimated missed 60Hz frame opportunities.</p>
           </div>
           <div className="benchmark-card">
             <span>Worker path gap</span>
             <strong>{summary.workerMaxTimerGapMs} ms</strong>
-            <p>{summary.workerMissedFramesAt60hz} missed 60Hz frames in the benchmark run.</p>
+            <p>{summary.workerMissedFramesAt60hz} estimated missed 60Hz frame opportunities.</p>
           </div>
         </div>
 
@@ -169,7 +204,7 @@ export function Hero() {
             <span>Scenario</span>
             <span>Total time</span>
             <span>Max timer gap</span>
-            <span>Missed frames</span>
+            <span>Estimated missed frames</span>
           </div>
           <div>
             <span>Main thread</span>
@@ -187,14 +222,16 @@ export function Hero() {
 
         <p className="note">
           Generated by <code>pnpm benchmark</code> on {benchmark.environment.runtime}. Checksum
-          matched: {summary.checksumMatched ? 'yes' : 'no'}.
+          matched: {summary.checksumMatched ? 'yes' : 'no'}. This saved Node.js run measures timer
+          gaps, not browser paint frames or hook overhead. Results vary by device; try the browser
+          comparison above.
         </p>
       </section>
 
       <section id="api" className="section-band">
         <div className="section-heading">
           <p className="eyebrow">API quick reference</p>
-          <h2>The current API surface is intentionally small.</h2>
+          <h2>One hook. A familiar workflow.</h2>
         </div>
         <div className="api-grid">
           <article>
@@ -237,17 +274,36 @@ export function Hero() {
         <CodeBlock code={progressExample} title="progress-worker.ts" className="full-width" />
       </section>
 
-      <section className="section-band todo-band">
+      <section id="updates" className="section-band release-band">
         <div>
-          <p className="eyebrow">Known TODO</p>
-          <h2>Runtime follow-up is tracked separately.</h2>
+          <p className="eyebrow">Maintenance update · unreleased</p>
+          <h2>A more dependable lifecycle.</h2>
+          <p>
+            The next patch, 2.2.2, focuses on task settlement and cleanup. The published package is
+            still 2.2.1.
+          </p>
         </div>
-        <p>
-          The documentation now reflects the current API. A later core pass should address blob URL
-          cache keys, synchronous concurrent calls, cancellation semantics, and behavior-level hook
-          tests.
-        </p>
+        <div className="release-detail">
+          <span className="release-badge">2.2.2 · pending</span>
+          <ul>
+            <li>Overlapping calls leave the active task intact.</li>
+            <li>
+              Cancellation settles with an <code>AbortError</code>.
+            </li>
+            <li>Workers, timers, and Blob URLs are released when a task ends.</li>
+          </ul>
+          <a href="https://github.com/vooyajs/use-web-worker/pull/1">
+            Read the patch notes <span aria-hidden="true">↗</span>
+          </a>
+        </div>
       </section>
+      <footer className="site-footer">
+        <a className="brand" href="#top">
+          useWebWorker
+        </a>
+        <span>A small part of the Vooya ecosystem.</span>
+        <a href="https://github.com/vooyajs/use-web-worker">Source on GitHub ↗</a>
+      </footer>
     </main>
   );
 }

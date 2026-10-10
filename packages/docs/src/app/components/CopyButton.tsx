@@ -1,7 +1,6 @@
 'use client';
 
-import clipboard from 'clipboard-js';
-import { useCallback, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FaCheck, FaCopy } from 'react-icons/fa';
 
 interface CopyButtonParams {
@@ -11,31 +10,50 @@ interface CopyButtonParams {
 }
 
 export function CopyButton({ text, className, style }: CopyButtonParams) {
-  const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'copied' | 'error'>('idle');
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    []
+  );
 
-  const handleCopy = useCallback(async () => {
+  async function handleCopy() {
+    if (timer.current) clearTimeout(timer.current);
     try {
-      await clipboard.copy(text);
-      setCopied(true);
-    } catch (error) {
-      console.error('Failed to copy code:', error);
-    } finally {
-      const timer = setTimeout(() => {
-        setCopied(false);
-        clearTimeout(timer);
-      }, 2000);
+      await navigator.clipboard.writeText(text);
+      setStatus('copied');
+    } catch {
+      setStatus('error');
     }
-  }, [text]);
+    timer.current = setTimeout(() => setStatus('idle'), 2000);
+  }
 
+  const label =
+    status === 'copied'
+      ? 'Copied'
+      : status === 'error'
+        ? 'Copy failed. Select the text to copy.'
+        : 'Copy code';
   return (
     <div className={className} style={style}>
-      <button onClick={handleCopy} className="copy-btn" title="复制代码">
-        {copied ? (
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="copy-btn"
+        title={label}
+        aria-label={label}
+      >
+        {status === 'copied' ? (
           <FaCheck className="copy-btn-icon copy-btn-check" />
         ) : (
           <FaCopy className="copy-btn-icon" />
         )}
       </button>
+      <span className="copy-announcement" role="status">
+        {status === 'idle' ? '' : label}
+      </span>
     </div>
   );
 }
